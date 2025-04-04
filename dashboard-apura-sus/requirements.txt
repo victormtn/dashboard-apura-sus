@@ -1,6 +1,8 @@
 dash
-pandas
 plotly
+pandas
 fpdf
 flask
-dash-bootstrap-components
+dash.dependencies
+plotly.express
+io

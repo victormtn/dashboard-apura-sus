@@ -3,3 +3,6 @@ plotly
 pandas
 fpdf
 flask
+dash.dependencies
+plotly.express
+io
