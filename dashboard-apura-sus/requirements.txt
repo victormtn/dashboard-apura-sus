@@ -1,8 +1,5 @@
-dash
-plotly
-pandas
-fpdf
-flask
-dash.dependencies
-plotly.express
-io
+dash==2.11.1
+plotly==5.15.0
+pandas==1.5.3
+fpdf==1.7.2
+flask==2.2.5
