@@ -5,10 +5,11 @@ from dash.dependencies import Input, Output, State
 import plotly.express as px
 from fpdf import FPDF
 import io
-from flask import send_file
+from flask import send_file, Flask
 
-# Inicializa o app Dash
-app = dash.Dash(__name__)
+# Inicializa o servidor Flask
+server = Flask(__name__)
+app = dash.Dash(__name__, server=server)
 
 # Função para carregar os dados de um arquivo (Excel, CSV)
 def load_data(file_path):
