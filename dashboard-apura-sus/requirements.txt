@@ -1,0 +1,6 @@
+dash
+pandas
+plotly
+fpdf
+flask
+dash-bootstrap-components
