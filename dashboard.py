@@ -6,6 +6,7 @@ import plotly.express as px
 from fpdf import FPDF
 import io
 from flask import send_file, Flask
+import os
 
 # Inicializa o servidor Flask
 server = Flask(__name__)
@@ -426,4 +427,5 @@ def generate_pdf(n_clicks, dates, hospitals, cost_centers, categories):
 
 # Rodar o App
 if __name__ == "__main__":
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 8050))  # Use a porta fornecida pelo Render ou 8050 como padrão
+    app.run(host="0.0.0.0", port=port, debug=True)
