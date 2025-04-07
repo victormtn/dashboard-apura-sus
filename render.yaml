@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: dashboard-apura-sus
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: python src/dashboard.py
+    env: python
+    region: oregon
+    plan: free
+    autoDeploy: true
