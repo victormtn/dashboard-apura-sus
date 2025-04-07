@@ -427,5 +427,5 @@ def generate_pdf(n_clicks, dates, hospitals, cost_centers, categories):
 
 # Rodar o App
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 10000))  # Use a porta fornecida pelo Render ou 8050 como padrão
+    port = int(os.environ.get("PORT", 8050))  # Use a porta fornecida pelo Render ou 8050 como padrão
     app.run(host="0.0.0.0", port=port, debug=True)
