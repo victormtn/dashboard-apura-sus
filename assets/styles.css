@@ -46,5 +46,3 @@ body {
     font-weight: bold;
     margin-top: 20px;
 }
-
-pdf.image("assets/logo_govmt_horizontal.jpg", x=10, y=8, w=60)
