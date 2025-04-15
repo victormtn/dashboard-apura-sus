@@ -10,6 +10,7 @@ from flask import send_file, Flask
 import os
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
+import json
 
 # Inicializa o servidor Flask
 server = Flask(__name__)
@@ -21,7 +22,9 @@ def load_data_from_sheets(sheet_url):
     scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
 
     # Credenciais da conta de serviço
-    credentials = ServiceAccountCredentials.from_json_keyfile_name("base-de-dados-apura-sus@luminous-empire-456918-d2.iam.gserviceaccount.com", scope)
+    credentials = ServiceAccountCredentials.from_json_keyfile_dict(
+        json.loads(os.environ["GOOGLE_SHEETS_CREDENTIALS"]), scope
+    )
 
     # Autenticar e acessar o Google Sheets
     client = gspread.authorize(credentials)
