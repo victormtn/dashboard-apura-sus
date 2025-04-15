@@ -391,13 +391,16 @@ def generate_pdf(n_clicks, dates, hospitals, cost_centers, categories):
 
     # Salvar o PDF em memória
     pdf_output = io.BytesIO()
-    pdf.output(pdf_output)
+    pdf_bytes = pdf.output(dest='S').encode('latin1')
+    pdf_output.write(pdf_bytes)
     pdf_output.seek(0)
 
     # Retornar o PDF para download
     return dcc.send_file(
-        io.BytesIO(pdf_output.read()),
-        filename="relatorio_gastos.pdf"
+        pdf_output,
+        mimetype='application/pdf',
+        as_attachment=True,
+        download_name='relatorio.pdf'
     )
 
 # Rodar o App
