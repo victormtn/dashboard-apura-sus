@@ -21,7 +21,7 @@ def load_data_from_sheets(sheet_url):
     scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
 
     # Credenciais da conta de serviço
-    credentials = ServiceAccountCredentials.from_json_keyfile_name("C:\Users\victornadim\Desktop\dashboard-apura-sus.git\luminous-empire-456918-d2-bce5145c696b.json", scope)
+    credentials = ServiceAccountCredentials.from_json_keyfile_name("base-de-dados-apura-sus@luminous-empire-456918-d2.iam.gserviceaccount.com", scope)
 
     # Autenticar e acessar o Google Sheets
     client = gspread.authorize(credentials)
