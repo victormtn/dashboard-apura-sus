@@ -8,22 +8,43 @@ import io
 import base64
 from flask import send_file, Flask
 import os
+import gspread
+from oauth2client.service_account import ServiceAccountCredentials
 
 # Inicializa o servidor Flask
 server = Flask(__name__)
 app = dash.Dash(__name__, server=server)
 
-# Função para carregar os dados de um arquivo (Excel, CSV)
-def load_data(file_path):
-    if file_path.endswith(".csv"):
-        return pd.read_csv(file_path)
-    elif file_path.endswith(".xlsx") or file_path.endswith(".xls"):
-        return pd.read_excel(file_path)
-    else:
-        return None
+# Configurar o acesso ao Google Sheets
+def load_data_from_sheets(sheet_url):
+    # Escopo da API
+    scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
 
-# Carregar dados (mudar o caminho conforme necessário)
-df = load_data("Base de Dados - Apura SUS.xlsx")  # Substituir pelo seu arquivo
+    # Credenciais da conta de serviço
+    credentials = ServiceAccountCredentials.from_json_keyfile_name("path/to/credentials.json", scope)
+
+    # Autenticar e acessar o Google Sheets
+    client = gspread.authorize(credentials)
+
+    # Abrir a planilha pelo URL
+    sheet = client.open_by_url(sheet_url)
+
+    # Selecionar a primeira aba da planilha
+    worksheet = sheet.get_worksheet(0)
+
+    # Obter os dados como uma lista de listas
+    data = worksheet.get_all_records()
+
+    # Converter para um DataFrame do Pandas
+    df = pd.DataFrame(data)
+
+    return df
+
+# URL da planilha no Google Sheets
+sheet_url = "https://docs.google.com/spreadsheets/d/1xpIBGZibAYcOjrs5yR0lBggW8OBziMzPnJb-5Vfef38/edit?usp=sharing"
+
+# Substitua a função de carregamento de dados local
+df = load_data_from_sheets(sheet_url)
 
 # Formatar a coluna de Data para exibir apenas mês/ano
 df['Data'] = pd.to_datetime(df['Data']).dt.to_period('M').astype(str)
