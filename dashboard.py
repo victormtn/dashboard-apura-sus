@@ -396,11 +396,9 @@ def generate_pdf(n_clicks, dates, hospitals, cost_centers, categories):
     pdf_output.seek(0)
 
     # Retornar o PDF para download
-    return dcc.send_file(
-        pdf_output,
-        mimetype='application/pdf',
-        as_attachment=True,
-        download_name='relatorio.pdf'
+    return dcc.send_bytes(
+        pdf_output.getvalue(),  # Conteúdo do PDF
+        filename="relatorio.pdf"  # Nome do arquivo para download
     )
 
 # Rodar o App
