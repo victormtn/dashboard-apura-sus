@@ -374,7 +374,7 @@ def generate_pdf(n_clicks, dates, hospitals, cost_centers, categories):
     pdf.set_font("Arial", size=12)
     
     # Adicionar a logo
-    pdf.image("assets/LOGO SES-MT.png", x=7, y=6, w=30)  # Ajuste o tamanho conforme necessário
+    pdf.image("assets/LOGO SES-MT.png", x=8, y=68, w=45)  # Ajuste o tamanho conforme necessário
     pdf.ln(20)  # Espaçamento após a imagem
     
     # Adicionar título principal
