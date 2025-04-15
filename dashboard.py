@@ -38,8 +38,9 @@ app.layout = html.Div(
     children=[
         # Logo no canto superior esquerdo
         html.Img(
-            src="/assets/logo_govmt_horizontal.jpg",  # Caminho para a logo
-            className="logo"  # Classe CSS para posicionar a logo
+            src="/assets/LOGO SES-MT.png",  # Caminho para a nova logo
+            className="logo",  # Classe CSS para posicionar a logo
+            style={"width": "100px", "height": "auto"}  # Ajuste o tamanho da logo
         ),
         
         # Botão para Modo Daltonismo
@@ -373,7 +374,7 @@ def generate_pdf(n_clicks, dates, hospitals, cost_centers, categories):
     pdf.set_font("Arial", size=12)
     
     # Adicionar a logo
-    pdf.image("assets/logo_govmt_horizontal.jpg", x=10, y=8, w=60)  # Ajuste o caminho e o tamanho conforme necessário
+    pdf.image("assets/LOGO SES-MT.png", x=7, y=6, w=30)  # Ajuste o tamanho conforme necessário
     pdf.ln(20)  # Espaçamento após a imagem
     
     # Adicionar título principal
