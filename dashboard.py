@@ -36,12 +36,7 @@ print("Colunas do DataFrame:", df.columns)
 # Layout do Dashboard
 app.layout = html.Div(
     children=[
-        # Logo no canto superior esquerdo
-        html.Img(
-            src="/assets/LOGO SES-MT.png",  # Caminho para a nova logo
-            className="logo",  # Classe CSS para posicionar a logo
-            style={"width": "100px", "height": "auto"}  # Ajuste o tamanho da logo
-        ),
+
         
         # Botão para Modo Daltonismo
         html.Button(
@@ -61,26 +56,7 @@ app.layout = html.Div(
                 'fontSize': '14px'
             }
         ),
-        
-        # Botão para Baixar Relatório em PDF
-        html.Button(
-            "Baixar Relatório (PDF)", 
-            id="download-pdf-button",  # ID do botão
-            n_clicks=0,  # Contador de cliques
-            style={
-                'position': 'absolute',
-                'top': '10px',
-                'right': '150px',  # Ajuste para posicionar ao lado do botão de Modo Daltonismo
-                'padding': '10px 20px',
-                'backgroundColor': '#28a745',
-                'color': 'white',
-                'border': 'none',
-                'borderRadius': '5px',
-                'cursor': 'pointer',
-                'fontSize': '14px'
-            }
-        ),
-        dcc.Download(id="download-pdf"),  # Componente para gerenciar o download
+
         
         html.H1(
             "Apura-SUS",
@@ -350,16 +326,7 @@ def select_all_cost_centers(n_clicks):
         return [cost_center for cost_center in df['Centro de Custo'].unique()]  # Seleciona todas as opções
     return dash.no_update  # Não atualiza se o botão não for clicado
 
-@app.callback(
-    Output("download-pdf", "data"),  # Vincula o download ao componente dcc.Download
-    [Input("download-pdf-button", "n_clicks")],  # Dispara o download ao clicar no botão
-    [State("date-filter", "value"),  # Filtros aplicados no dashboard
-     State("hospital-filter", "value"),
-     State("cost-center-filter", "value"),
-     State("category-filter", "value")],
-    prevent_initial_call=True  # Evita que o callback seja executado ao carregar a página
-)
-def generate_pdf(n_clicks, dates, hospitals, cost_centers, categories):
+
     # Filtrar os dados com base nos filtros selecionados
     filtered_df = df[
         (df['Data'].isin(dates)) &
