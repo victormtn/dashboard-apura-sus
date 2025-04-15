@@ -5,6 +5,7 @@ from dash.dependencies import Input, Output, State
 import plotly.express as px
 from fpdf import FPDF
 import io
+import base64
 from flask import send_file, Flask
 import os
 
@@ -37,6 +38,11 @@ print("Colunas do DataFrame:", df.columns)
 app.layout = html.Div(
     children=[
 
+        html.Img(
+            src="/assets/logoses.png",  # Caminho para a logo
+            className="logo",  # Classe CSS para posicionar a logo
+            style={"width": "100px", "height": "auto", "position": "absolute", "top": "10px", "left": "10px"}
+        ),
         
         # Botão para Modo Daltonismo
         html.Button(
@@ -57,6 +63,24 @@ app.layout = html.Div(
             }
         ),
 
+        html.Button(
+            "Gerar Relatório (PDF)", 
+            id="generate-pdf-button",  # ID do botão
+            n_clicks=0,  # Contador de cliques
+            style={
+                'position': 'absolute',
+                'top': '10px',
+                'right': '10px',
+                'padding': '10px 20px',
+                'backgroundColor': '#28a745',
+                'color': 'white',
+                'border': 'none',
+                'borderRadius': '5px',
+                'cursor': 'pointer',
+                'fontSize': '14px'
+            }
+        ),
+        dcc.Download(id="download-pdf"),  # Componente para gerenciar o download
         
         html.H1(
             "Apura-SUS",
@@ -326,72 +350,55 @@ def select_all_cost_centers(n_clicks):
         return [cost_center for cost_center in df['Centro de Custo'].unique()]  # Seleciona todas as opções
     return dash.no_update  # Não atualiza se o botão não for clicado
 
-
-    # Filtrar os dados com base nos filtros selecionados
-    filtered_df = df[
-        (df['Data'].isin(dates)) &
-        (df['Hospital'].isin(hospitals)) &
-        (df['Centro de Custo'].isin(cost_centers)) &
-        (df['Categoria'].isin(categories))
-    ]
-    
+@app.callback(
+    Output("download-pdf", "data"),  # Vincula o download ao componente dcc.Download
+    [Input("generate-pdf-button", "n_clicks")],  # Dispara o download ao clicar no botão
+    [State("date-filter", "value"),  # Filtros aplicados no dashboard
+     State("hospital-filter", "value"),
+     State("cost-center-filter", "value"),
+     State("category-filter", "value")],
+    prevent_initial_call=True  # Evita que o callback seja executado ao carregar a página
+)
+def generate_pdf(n_clicks, dates, hospitals, cost_centers, categories):
     # Criar o PDF
     pdf = FPDF()
     pdf.add_page()
     pdf.set_font("Arial", size=12)
-    
+
     # Adicionar a logo
-    pdf.image("assets/LOGO SES-MT.png", x=8, y=68, w=45)  # Ajuste o tamanho conforme necessário
+    pdf.image("assets/logoses.png", x=10, y=8, w=30)  # Ajuste o tamanho conforme necessário
     pdf.ln(20)  # Espaçamento após a imagem
-    
+
     # Adicionar título principal
     pdf.set_font("Arial", style="B", size=16)
     pdf.cell(200, 10, txt="Relatório de Gastos - Apura SUS", ln=True, align='C')
-    pdf.ln(5)  # Espaçamento
-    
-    # Adicionar subtítulo
-    pdf.set_font("Arial", style="B", size=12)
-    pdf.cell(200, 10, txt="GABINETE DO SECRETÁRIO ADJUNTO DE GESTÃO HOSPITALAR", ln=True, align='C')
-    pdf.ln(10)  # Espaçamento
-    
-    # Adicionar informações de categorias
+    pdf.ln(10)
+
+    # Adicionar informações filtradas
+    pdf.set_font("Arial", size=12)
+    pdf.cell(200, 10, txt=f"Datas Selecionadas: {', '.join(dates)}", ln=True)
+    pdf.cell(200, 10, txt=f"Hospitais Selecionados: {', '.join(hospitals)}", ln=True)
+    pdf.cell(200, 10, txt=f"Centros de Custo Selecionados: {', '.join(cost_centers)}", ln=True)
+    pdf.cell(200, 10, txt=f"Categorias Selecionadas: {', '.join(categories)}", ln=True)
+    pdf.ln(10)
+
+    # Adicionar tabela de gastos (exemplo)
     pdf.set_font("Arial", style="B", size=14)
     pdf.cell(200, 10, txt="Gastos por Categoria:", ln=True)
     pdf.set_font("Arial", size=12)
-    category_totals = filtered_df.groupby("Categoria")["Valor"].sum().reset_index()
-    category_totals["Percentual"] = (category_totals["Valor"] / category_totals["Valor"].sum()) * 100
-    for _, row in category_totals.iterrows():
-        pdf.cell(200, 10, txt=f"{row['Categoria']}: R$ {row['Valor']:,.2f} ({row['Percentual']:.2f}%)", ln=True)
-    pdf.ln(10)
-    
-    # Adicionar informações de hospitais
-    pdf.set_font("Arial", style="B", size=14)
-    pdf.cell(200, 10, txt="Gastos por Hospital:", ln=True)
-    pdf.set_font("Arial", size=12)
-    hospital_totals = filtered_df.groupby("Hospital")["Valor"].sum().reset_index()
-    hospital_totals["Percentual"] = (hospital_totals["Valor"] / hospital_totals["Valor"].sum()) * 100
-    for _, row in hospital_totals.iterrows():
-        pdf.cell(200, 10, txt=f"{row['Hospital']}: R$ {row['Valor']:,.2f} ({row['Percentual']:.2f}%)", ln=True)
-    pdf.ln(10)
-    
-    # Adicionar informações de centro de custo
-    pdf.set_font("Arial", style="B", size=14)
-    pdf.cell(200, 10, txt="Gastos por Centro de Custo:", ln=True)
-    pdf.set_font("Arial", size=12)
-    cost_center_totals = filtered_df.groupby("Centro de Custo")["Valor"].sum().reset_index()
-    cost_center_totals["Percentual"] = (cost_center_totals["Valor"] / cost_center_totals["Valor"].sum()) * 100
-    for _, row in cost_center_totals.iterrows():
-        pdf.cell(200, 10, txt=f"{row['Centro de Custo']}: R$ {row['Valor']:,.2f} ({row['Percentual']:.2f}%)", ln=True)
-    pdf.ln(10)
-    
+    for category in categories:
+        pdf.cell(200, 10, txt=f"- {category}: R$ {df[df['Categoria'] == category]['Valor'].sum():,.2f}", ln=True)
+
     # Salvar o PDF em memória
     pdf_output = io.BytesIO()
-    pdf_content = pdf.output(dest='S').encode('latin1')  # Gera o conteúdo do PDF como string binária
-    pdf_output.write(pdf_content)
+    pdf.output(pdf_output)
     pdf_output.seek(0)
-    
+
     # Retornar o PDF para download
-    return dcc.send_bytes(pdf_output.getvalue(), "relatorio_gastos.pdf")
+    return dcc.send_file(
+        io.BytesIO(pdf_output.read()),
+        filename="relatorio_gastos.pdf"
+    )
 
 # Rodar o App
 if __name__ == "__main__":
