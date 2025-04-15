@@ -360,6 +360,14 @@ def select_all_cost_centers(n_clicks):
     prevent_initial_call=True  # Evita que o callback seja executado ao carregar a página
 )
 def generate_pdf(n_clicks, dates, hospitals, cost_centers, categories):
+    # Filtrar os dados com base nos filtros selecionados
+    filtered_df = df[
+        (df['Data'].isin(dates)) &
+        (df['Hospital'].isin(hospitals)) &
+        (df['Centro de Custo'].isin(cost_centers)) &
+        (df['Categoria'].isin(categories))
+    ]
+
     # Criar o PDF
     pdf = FPDF()
     pdf.add_page()
@@ -382,12 +390,32 @@ def generate_pdf(n_clicks, dates, hospitals, cost_centers, categories):
     pdf.cell(200, 10, txt=f"Categorias Selecionadas: {', '.join(categories)}", ln=True)
     pdf.ln(10)
 
-    # Adicionar tabela de gastos (exemplo)
+    # Adicionar tabela de gastos por categoria
     pdf.set_font("Arial", style="B", size=14)
     pdf.cell(200, 10, txt="Gastos por Categoria:", ln=True)
     pdf.set_font("Arial", size=12)
-    for category in categories:
-        pdf.cell(200, 10, txt=f"- {category}: R$ {df[df['Categoria'] == category]['Valor'].sum():,.2f}", ln=True)
+    category_totals = filtered_df.groupby("Categoria")["Valor"].sum().reset_index()
+    for _, row in category_totals.iterrows():
+        pdf.cell(200, 10, txt=f"- {row['Categoria']}: R$ {row['Valor']:,.2f}", ln=True)
+    pdf.ln(10)
+
+    # Adicionar tabela de gastos por hospital
+    pdf.set_font("Arial", style="B", size=14)
+    pdf.cell(200, 10, txt="Gastos por Hospital:", ln=True)
+    pdf.set_font("Arial", size=12)
+    hospital_totals = filtered_df.groupby("Hospital")["Valor"].sum().reset_index()
+    for _, row in hospital_totals.iterrows():
+        pdf.cell(200, 10, txt=f"- {row['Hospital']}: R$ {row['Valor']:,.2f}", ln=True)
+    pdf.ln(10)
+
+    # Adicionar tabela de gastos por centro de custo
+    pdf.set_font("Arial", style="B", size=14)
+    pdf.cell(200, 10, txt="Gastos por Centro de Custo:", ln=True)
+    pdf.set_font("Arial", size=12)
+    cost_center_totals = filtered_df.groupby("Centro de Custo")["Valor"].sum().reset_index()
+    for _, row in cost_center_totals.iterrows():
+        pdf.cell(200, 10, txt=f"- {row['Centro de Custo']}: R$ {row['Valor']:,.2f}", ln=True)
+    pdf.ln(10)
 
     # Salvar o PDF em memória
     pdf_output = io.BytesIO()
