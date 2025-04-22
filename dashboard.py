@@ -49,7 +49,8 @@ sheet_url = "https://docs.google.com/spreadsheets/d/1xpIBGZibAYcOjrs5yR0lBggW8OB
 # Substitua a função de carregamento de dados local
 df = load_data_from_sheets(sheet_url)
 
-# Formatar a coluna de Data para exibir apenas mês/ano
+# Tratar a coluna 'Data'
+df['Data'] = df['Data'].str.strip()  # Remover espaços extras
 df['Data'] = pd.to_datetime(df['Data'], format='%B/%Y', errors='coerce').dt.to_period('M').astype(str)
 
 # Verificar valores inválidos na coluna 'Data'
@@ -58,8 +59,9 @@ if df['Data'].isna().any():
     print(df[df['Data'].isna()])
     df = df.dropna(subset=['Data'])  # Remover linhas com valores inválidos (opcional)
 
-# Converter a coluna 'Valor' para numérica
-df['Valor'] = pd.to_numeric(df['Valor'], errors='coerce')
+# Tratar a coluna 'Valor'
+df['Valor'] = df['Valor'].replace({',': '', ' ': ''}, regex=True)  # Remover caracteres não numéricos
+df['Valor'] = pd.to_numeric(df['Valor'], errors='coerce')  # Converter para numérico
 
 # Verificar valores inválidos na coluna 'Valor'
 if df['Valor'].isna().any():
@@ -67,10 +69,8 @@ if df['Valor'].isna().any():
     print(df[df['Valor'].isna()])
     df = df.dropna(subset=['Valor'])  # Remover linhas com valores inválidos (opcional)
 
-# Verificar as colunas do DataFrame
-print("Colunas do DataFrame:", df.columns)
-
-print("Pré-visualização dos dados processados:")
+# Pré-visualizar os dados processados
+print("Pré-visualização dos dados processados após o tratamento:")
 print(df.head())
 
 # Layout do Dashboard
