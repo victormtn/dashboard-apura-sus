@@ -50,7 +50,7 @@ sheet_url = "https://docs.google.com/spreadsheets/d/1xpIBGZibAYcOjrs5yR0lBggW8OB
 df = load_data_from_sheets(sheet_url)
 
 # Formatar a coluna de Data para exibir apenas mês/ano
-df['Data'] = pd.to_datetime(df['Data']).dt.to_period('M').astype(str)
+df['Data'] = pd.to_datetime(df['Data'], format='%B/%Y', errors='coerce').dt.to_period('M').astype(str)
 
 # Converter a coluna 'Valor' para numérica
 df['Valor'] = pd.to_numeric(df['Valor'], errors='coerce')
