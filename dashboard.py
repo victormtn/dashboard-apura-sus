@@ -51,6 +51,7 @@ df = load_data_from_sheets(sheet_url)
 
 # Tratar a coluna 'Data'
 df['Data'] = df['Data'].str.strip()  # Remover espaços extras
+print("Valores únicos na coluna 'Data':", df['Data'].unique())  # Verificar valores únicos
 df['Data'] = pd.to_datetime(df['Data'], format='%B/%Y', errors='coerce').dt.to_period('M').astype(str)
 
 # Verificar valores inválidos na coluna 'Data'
@@ -61,6 +62,7 @@ if df['Data'].isna().any():
 
 # Tratar a coluna 'Valor'
 df['Valor'] = df['Valor'].replace({',': '', ' ': ''}, regex=True)  # Remover caracteres não numéricos
+print("Valores únicos na coluna 'Valor':", df['Valor'].unique())  # Verificar valores únicos
 df['Valor'] = pd.to_numeric(df['Valor'], errors='coerce')  # Converter para numérico
 
 # Verificar valores inválidos na coluna 'Valor'
