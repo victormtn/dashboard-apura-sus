@@ -53,9 +53,17 @@ df = load_data_from_sheets(sheet_url)
 df['Data'] = df['Data'].astype(str).str.strip()  # Converter para texto e remover espaços extras
 print("Valores únicos na coluna 'Data':", df['Data'].unique())  # Verificar valores únicos
 
-# Tratar a coluna 'Valor' como texto
-df['Valor'] = df['Valor'].astype(str).str.replace(',', '').str.strip()  # Converter para texto, remover vírgulas e espaços
-print("Valores únicos na coluna 'Valor':", df['Valor'].unique())  # Verificar valores únicos
+# Tratar a coluna 'Valor' como numérico
+df['Valor'] = pd.to_numeric(df['Valor'].str.replace(',', '').str.strip(), errors='coerce')
+
+# Garantir que a coluna 'Valor' seja numérica no DataFrame original
+df['Valor'] = pd.to_numeric(df['Valor'], errors='coerce')
+
+# Verificar valores inválidos na coluna 'Valor'
+if df['Valor'].isna().any():
+    print("Valores inválidos encontrados na coluna 'Valor':")
+    print(df[df['Valor'].isna()])
+    df = df.dropna(subset=['Valor'])  # Remover linhas com valores inválidos (opcional)
 
 # Pré-visualizar os dados processados
 print("Pré-visualização dos dados processados após o tratamento:")
@@ -238,6 +246,9 @@ def update_dashboard(dates, hospitals, cost_centers, categories, n_clicks):
     # Escolher as cores com base no modo
     colors = daltonic_colors if is_daltonic_mode else normal_colors
     
+    # Garantir que a coluna 'Valor' seja numérica no DataFrame original
+    df['Valor'] = pd.to_numeric(df['Valor'], errors='coerce')
+    
     # Filtrar os dados com base nos filtros selecionados
     filtered_df = df[
         (df['Data'].isin(dates)) &
@@ -245,6 +256,9 @@ def update_dashboard(dates, hospitals, cost_centers, categories, n_clicks):
         (df['Centro de Custo'].isin(cost_centers)) &
         (df['Categoria'].isin(categories))
     ]
+    
+    # Garantir que a coluna 'Valor' seja numérica no DataFrame filtrado
+    filtered_df['Valor'] = pd.to_numeric(filtered_df['Valor'], errors='coerce')
     
     # Verificar se há dados filtrados
     if filtered_df.empty:
