@@ -49,27 +49,13 @@ sheet_url = "https://docs.google.com/spreadsheets/d/1xpIBGZibAYcOjrs5yR0lBggW8OB
 # Substitua a função de carregamento de dados local
 df = load_data_from_sheets(sheet_url)
 
-# Tratar a coluna 'Data'
-df['Data'] = df['Data'].str.strip()  # Remover espaços extras
+# Tratar a coluna 'Data' como texto
+df['Data'] = df['Data'].astype(str).str.strip()  # Converter para texto e remover espaços extras
 print("Valores únicos na coluna 'Data':", df['Data'].unique())  # Verificar valores únicos
-df['Data'] = pd.to_datetime(df['Data'], format='%B/%Y', errors='coerce').dt.to_period('M').astype(str)
 
-# Verificar valores inválidos na coluna 'Data'
-if df['Data'].isna().any():
-    print("Valores inválidos encontrados na coluna 'Data':")
-    print(df[df['Data'].isna()])
-    df = df.dropna(subset=['Data'])  # Remover linhas com valores inválidos (opcional)
-
-# Tratar a coluna 'Valor'
-df['Valor'] = df['Valor'].replace({',': '', ' ': ''}, regex=True)  # Remover caracteres não numéricos
+# Tratar a coluna 'Valor' como texto
+df['Valor'] = df['Valor'].astype(str).str.replace(',', '').str.strip()  # Converter para texto, remover vírgulas e espaços
 print("Valores únicos na coluna 'Valor':", df['Valor'].unique())  # Verificar valores únicos
-df['Valor'] = pd.to_numeric(df['Valor'], errors='coerce')  # Converter para numérico
-
-# Verificar valores inválidos na coluna 'Valor'
-if df['Valor'].isna().any():
-    print("Valores inválidos encontrados na coluna 'Valor':")
-    print(df[df['Valor'].isna()])
-    df = df.dropna(subset=['Valor'])  # Remover linhas com valores inválidos (opcional)
 
 # Pré-visualizar os dados processados
 print("Pré-visualização dos dados processados após o tratamento:")
