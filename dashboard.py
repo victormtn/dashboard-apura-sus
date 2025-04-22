@@ -52,11 +52,26 @@ df = load_data_from_sheets(sheet_url)
 # Formatar a coluna de Data para exibir apenas mês/ano
 df['Data'] = pd.to_datetime(df['Data'], format='%B/%Y', errors='coerce').dt.to_period('M').astype(str)
 
+# Verificar valores inválidos na coluna 'Data'
+if df['Data'].isna().any():
+    print("Valores inválidos encontrados na coluna 'Data':")
+    print(df[df['Data'].isna()])
+    df = df.dropna(subset=['Data'])  # Remover linhas com valores inválidos (opcional)
+
 # Converter a coluna 'Valor' para numérica
 df['Valor'] = pd.to_numeric(df['Valor'], errors='coerce')
 
+# Verificar valores inválidos na coluna 'Valor'
+if df['Valor'].isna().any():
+    print("Valores inválidos encontrados na coluna 'Valor':")
+    print(df[df['Valor'].isna()])
+    df = df.dropna(subset=['Valor'])  # Remover linhas com valores inválidos (opcional)
+
 # Verificar as colunas do DataFrame
 print("Colunas do DataFrame:", df.columns)
+
+print("Pré-visualização dos dados processados:")
+print(df.head())
 
 # Layout do Dashboard
 app.layout = html.Div(
