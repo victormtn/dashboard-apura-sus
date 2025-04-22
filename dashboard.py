@@ -69,6 +69,12 @@ if df['Valor'].isna().any():
 print("Pré-visualização dos dados processados após o tratamento:")
 print(df.head())
 
+# Valor inicial para os filtros
+initial_date = df['Data'].unique()[0] if df['Data'].nunique() > 0 else "Sem Dados"
+initial_hospital = df['Hospital'].unique()[0] if df['Hospital'].nunique() > 0 else "Sem Dados"
+initial_cost_center = df['Centro de Custo'].unique()[0] if df['Centro de Custo'].nunique() > 0 else "Sem Dados"
+initial_category = df['Categoria'].unique()[0] if df['Categoria'].nunique() > 0 else "Sem Dados"
+
 # Layout do Dashboard
 app.layout = html.Div(
     children=[
@@ -128,14 +134,14 @@ app.layout = html.Div(
             dcc.Dropdown(
                 id="date-filter",
                 options=[{"label": date, "value": date} for date in df['Data'].unique()],
-                value=[df['Data'].unique()[0]],  # Valor inicial como lista
+                value=[initial_date],  # Valor inicial como lista
                 multi=True  # Permitir múltiplas seleções
             ),
             html.Label("Filtrar por Hospital:"),
             dcc.Dropdown(
                 id="hospital-filter",
                 options=[{"label": hospital, "value": hospital} for hospital in df['Hospital'].unique()],
-                value=[df['Hospital'].unique()[0]],  # Valor inicial como lista
+                value=[initial_hospital],  # Valor inicial como lista
                 multi=True  # Permitir múltiplas seleções
             ),
             html.Label("Filtrar por Centro de Custo:"),
@@ -143,7 +149,7 @@ app.layout = html.Div(
                 dcc.Dropdown(
                     id="cost-center-filter",
                     options=[{"label": cost_center, "value": cost_center} for cost_center in df['Centro de Custo'].unique()],
-                    value=[df['Centro de Custo'].unique()[0]],  # Apenas o primeiro valor selecionado inicialmente
+                    value=[initial_cost_center],  # Apenas o primeiro valor selecionado inicialmente
                     multi=True  # Permitir múltiplas seleções
                 ),
                 html.Button(
@@ -166,7 +172,7 @@ app.layout = html.Div(
             dcc.Dropdown(
                 id="category-filter",
                 options=[{"label": category, "value": category} for category in df['Categoria'].unique()],
-                value=[df['Categoria'].unique()[0]],  # Valor inicial como lista
+                value=[initial_category],  # Valor inicial como lista
                 multi=True  # Permitir múltiplas seleções
             ),
             # Valor Total logo abaixo dos filtros
